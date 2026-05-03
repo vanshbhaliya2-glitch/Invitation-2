@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Engagement Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Great+Vibes&family=Montserrat:wght@300;400&S&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --maroon: #630d16;
+            --gold: #d4af37;
+            --ivory: #fffdf5;
+            --dark-gold: #aa8a2e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #1a1a1a;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Background Pattern */
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #3d050a 0%, #1a0204 100%);
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        /* Particles/Petals */
+        #canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Container */
+        .wrapper {
+            position: relative;
+            width: 320px;
+            height: 450px;
+            perspective: 1500px;
+            z-index: 10;
+        }
+
+        /* Envelope Styling */
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: var(--maroon);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.8s ease;
+            transform-style: preserve-3d;
+        }
+
+        .envelope::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 130px solid var(--gold);
+            z-index: 3;
+            transform-origin: top;
+            transition: transform 0.6s 0.2s ease;
+        }
+
+        .envelope.open::before {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        .tap-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: var(--gold);
+            font-family: 'Cinzel Decorative';
+            letter-spacing: 2px;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* The Card */
+        .card {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 300px;
+            height: 0; /* Hidden initially */
+            background: var(--ivory);
+            border: 4px double var(--gold);
+            z-index: 2;
+            transition: all 0.8s ease;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+        }
+
+        .envelope.open .card {
+            height: 480px;
+            top: -200px;
+            opacity: 1;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Card Content Design */
+        .mandala {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            margin-bottom: 15px;
+            background: url('https://www.transparenttextures.com/patterns/mandala.png'); /* Fallback pattern */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            font-size: 2rem;
+        }
+
+        .parents { font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .message { font-family: 'Great Vibes', cursive; font-size: 1.5rem; color: var(--maroon); margin: 10px 0; }
+        .names { font-family: 'Cinzel Decorative', serif; font-size: 1.8rem; color: var(--maroon); margin-bottom: 10px; }
+        .details { font-size: 0.9rem; margin-top: 15px; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); padding: 10px 0; width: 100%; }
+        
+        .gold-btn {
+            background: var(--maroon);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 15px;
+            margin-top: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .gold-btn:hover { background: var(--gold); color: var(--maroon); }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+    <canvas id="canvas"></canvas>
+
+    <div class="wrapper">
+        <div class="envelope" id="envelope">
+            <div class="tap-text">TAP TO OPEN</div>
+            
+            <div class="card" id="card">
+                <div class="mandala">ॐ</div>
+                <p class="parents">Mr. & Mrs. Rajesh Sharma</p>
+                <p class="message">Together with their families invite you to the engagement of</p>
+                <h1 class="names">Aavya & Rohan</h1>
+                <p class="parents">& Mr. & Mrs. Sunil Verma</p>
+                
+                <div class="details">
+                    <p><strong>SUNDAY | MAY 24, 2026</strong></p>
+                    <p>7:00 PM ONWARDS</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">THE RAJ PALACE, JAIPUR</p>
+                </div>
+
+                <a href="https://maps.google.com" target="_blank" class="gold-btn">TAP FOR LOCATION</a>
+                <a href="https://wa.me/1234567890" class="gold-btn">RSVP VIA WHATSAPP</a>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const bgMusic = document.getElementById('bgMusic');
+
+        envelope.addEventListener('click', () => {
+            envelope.classList.toggle('open');
+            // Play music on first interaction (browser policy)
+            if (bgMusic.paused) {
+                bgMusic.volume = 0.4;
+                bgMusic.play().catch(e => console.log("Audio play blocked until user interaction"));
+            }
+        });
+
+        // Simple Petals/Sparkles Animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        for(let i = 0; i < 50; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speed: Math.random() * 1 + 0.5,
+                opacity: Math.random()
+            });
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(212, 175, 55, 0.5)"; 
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                p.y += p.speed;
+                if(p.y > canvas.height) p.y = -10;
+            });
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+    </script>
+</body>
+</html>

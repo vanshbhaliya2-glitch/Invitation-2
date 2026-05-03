@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Engagement Invite</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #f9d5ec, #e6ccff);
+  overflow: hidden;
+}
+
+/* SCRATCH CANVAS */
+#scratchContainer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* TEXT */
+#scratchText {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  color: gold;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* INVITE */
+#invite {
+  display: none;
+  height: 100vh;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.card {
+  width: 90%;
+  max-width: 380px;
+  background: linear-gradient(145deg, #fff, #ffe9f5);
+  border-radius: 25px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  position: relative;
+}
+
+/* UNFOLD STEPS */
+.step {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.8s ease;
+}
+
+.step.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* TEXT STYLE */
+h1 {
+  font-family: 'Playfair Display';
+  color: #b76e79;
+}
+
+.gold {
+  color: goldenrod;
+}
+
+/* BUTTON */
+.btn {
+  padding: 12px 20px;
+  margin: 10px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(45deg, gold, #ffd700);
+  font-weight: bold;
+}
+
+/* WELCOME */
+#welcome {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+  z-index: 20;
+}
+
+/* PETALS */
+.petal {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: pink;
+  border-radius: 50%;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10px); }
+  100% { transform: translateY(100vh); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SCRATCH -->
+<div id="scratchContainer">
+  <canvas id="scratchCanvas"></canvas>
+  <div id="scratchText">✨ Scratch to Reveal ✨</div>
+</div>
+
+<!-- INVITE -->
+<div id="invite">
+  <div class="card">
+
+    <div class="step" id="s1">
+      <p class="gold">Together with their families</p>
+    </div>
+
+    <div class="step" id="s2">
+      <h1>💖 Aanya & Rohan 💖</h1>
+    </div>
+
+    <div class="step" id="s3">
+      <p>Invite you to celebrate their Engagement</p>
+    </div>
+
+    <div class="step" id="s4">
+      <p>📅 25 December 2026</p>
+      <p>⏰ 7:00 PM</p>
+      <p>📍 Royal Palace</p>
+      <p style="font-size:22px;">👰 🤵</p>
+    </div>
+
+    <button class="btn" onclick="showWelcome()">OK</button>
+    <button class="btn" onclick="rsvp()">RSVP</button>
+
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div id="welcome">✨ Welcome to our celebration ✨</div>
+
+<!-- MUSIC -->
+<audio id="music" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
+</audio>
+
+<script>
+/* SCRATCH EFFECT */
+const canvas = document.getElementById("scratchCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+ctx.fillStyle = "#caa0ff";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+let isDrawing = false;
+
+function scratch(x,y){
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(x,y,30,0,Math.PI*2);
+  ctx.fill();
+}
+
+canvas.addEventListener("mousedown", ()=> isDrawing = true);
+canvas.addEventListener("mouseup", ()=> isDrawing = false);
+canvas.addEventListener("mousemove", e=>{
+  if(!isDrawing) return;
+  scratch(e.clientX, e.clientY);
+  checkReveal();
+});
+
+/* MOBILE TOUCH */
+canvas.addEventListener("touchmove", e=>{
+  const t = e.touches[0];
+  scratch(t.clientX, t.clientY);
+  checkReveal();
+});
+
+/* CHECK REVEAL */
+function checkReveal(){
+  const pixels = ctx.getImageData(0,0,canvas.width,canvas.height);
+  let cleared = 0;
+
+  for(let i=0;i<pixels.data.length;i+=4){
+    if(pixels.data[i+3] === 0) cleared++;
+  }
+
+  if(cleared > pixels.data.length/8){
+    document.getElementById("scratchContainer").style.display = "none";
+    startInvite();
+  }
+}
+
+/* START INVITE */
+function startInvite(){
+  document.getElementById("invite").style.display = "flex";
+  document.getElementById("music").play();
+
+  let steps = ["s1","s2","s3","s4"];
+  steps.forEach((id,i)=>{
+    setTimeout(()=>{
+      document.getElementById(id).classList.add("show");
+    }, i*800);
+  });
+}
+
+/* RSVP */
+function rsvp(){
+  window.open("https://wa.me/91XXXXXXXXXX");
+}
+
+/* WELCOME */
+function showWelcome(){
+  let w = document.getElementById("welcome");
+  w.style.display = "flex";
+  setTimeout(()=> w.style.display = "none", 3000);
+}
+
+/* PETALS */
+setInterval(()=>{
+  let p = document.createElement("div");
+  p.className = "petal";
+  p.style.left = Math.random()*100+"vw";
+  p.style.animationDuration = (3+Math.random()*2)+"s";
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(),5000);
+},200);
+</script>
+
+</body>
+</html>
